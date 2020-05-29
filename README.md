@@ -16,4 +16,7 @@ Using deep reinforcement learning to build a bot for Super Smash Bros Melee.
 
 run dolphin from terminal `dolphin-emu`
 
-Open Smash Bros. Melee ISO and begin playing!
+Open Smash Bros. Melee ISO and begin playing! 
+
+## Members:
+Daniel Cruz
