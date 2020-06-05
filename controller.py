@@ -2,9 +2,13 @@ import pyautogui
 import platform
 import pynput
 import time
+
+# *****************
 import directkeys
-right = 0xCd
 linux = False
+right = 'right'
+# *****************
+
 class Controller:
 	def __init__(self):
 		global linux
@@ -59,6 +63,14 @@ class Controller:
 
 		print("Screen calibrated to ", self.roi)
 
+	# ***************************
+	def determineControls(self):
+		global right
+		if linux == True:
+			right = 'right'
+		if linux == False:
+			right = 0xCd
+	# ***************************
 
 	def on_click(self, x, y, button, pressed):
 		if pressed:
@@ -76,11 +88,14 @@ class Controller:
 			# Release listener
 			return False
 
+	# ****************************
 	def win_press(self, x):
 		directkeys.PressKey(x)
 
 	def win_release(self, x):
 		directkeys.ReleaseKey(x)
+	# ****************************
+
 
 	def press(self, key):
 		pyautogui.press(key)
@@ -104,19 +119,22 @@ def main():
 	controller = Controller()
 	controller.center()
 	controller.click()
-
+	
+	# **************************************
+	controller.determineControls()
 	for i in range(5):
 		if linux == True:
 			# double jump
-			controller.keyDown('right')
+			controller.keyDown(right)
 			time.sleep(0.1)
-			controller.keyDown('right')
+			controller.keyDown(right)
 			time.sleep(1)
 		else:
 			controller.win_press(right)
 			time.sleep(0.1)
 			controller.win_release(right)
 			time.sleep(1)
+	# **************************************
 
 if __name__=="__main__":
 	main()
