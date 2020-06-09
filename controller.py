@@ -10,8 +10,6 @@ if platform.system() == 'Windows':
 else:
 	linux = True
 
-
-
 controls = {
 	"up": "up",
 	"right": "right",
@@ -38,15 +36,24 @@ controls = {
 class Controller:
 	def __init__(self):
 		global linux
+
+class Controller:
+	def __init__(self):
+
 		self.os = platform.system()
 		print(self.os)
 		self.screen = pyautogui.size()
 
 		# Region of interest
+
 		self.window = [-1, -1, -1, -1]
 
 		if self.os == 'Windows':
 			linux = False
+
+		self.roi = [-1, -1, -1, -1]
+
+		if self.os == 'Windows':
 			# import fails while using Linux
 			import pygetwindow as gw
 
@@ -58,12 +65,17 @@ class Controller:
 			window = gw.getWindowsWithTitle(window)[0]
 			window.moveTo(5, 5)
 			window.resizeTo(600, 500)
-
+      
 			self.window[0], self.window[1] = window.topleft
 			self.window[2], self.window[3] = window.bottomright
 
 		elif self.os == 'Linux':
 			linux = True
+      
+			self.roi[0], self.roi[1] = window.topleft
+			self.roi[2], self.roi[3] = window.bottomright
+
+		elif self.os == 'Linux':
 			print("Linux OS requires game window calibration")
 			self.calibrate_screen()
 			print("Calibration complete")
@@ -102,6 +114,30 @@ class Controller:
 				self.window[1] = y
 			elif self.window[3] == -1:
 				self.window[3] = y
+        
+		with pynput.mouse.Listener(on_click=self.on_click) as listener:
+			listener.join()
+		print(self.roi)
+		print("Move mouse to bottom of game window and click")
+
+		with pynput.mouse.Listener(on_click=self.on_click) as listener:
+			listener.join()
+
+		print("Screen calibrated to ", self.roi)
+
+
+	def on_click(self, x, y, button, pressed):
+		if pressed:
+			# set the values of roi
+			if self.roi[0] ==  -1:
+				self.roi[0] = x
+			elif self.roi[2] == -1:
+				self.roi[2] = x
+
+			if self.roi[1] == -1:
+				self.roi[1] = y
+			elif self.roi[3] == -1:
+				self.roi[3] = y
 
 			# Release listener
 			return False
@@ -190,6 +226,22 @@ def main():
 		for i in range(1):
 			controller.play(m)
 			time.sleep(2)
+
+		centerx = ((self.roi[2] - self.roi[0]) / 2) + self.roi[0]
+		centery = ((self.roi[3] - self.roi[1]) / 2) + self.roi[1]
+		pyautogui.moveTo(centerx, centery)
+
+def main():
+	controller = Controller()
+	controller.center()
+	controller.click()
+
+	for i in range(5):
+		# double jump
+		controller.keyDown('w')
+		time.sleep(0.1)
+		controller.keyDown('w')
+		time.sleep(1)
 
 if __name__=="__main__":
 	main()
