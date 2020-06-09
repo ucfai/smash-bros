@@ -1,0 +1,27 @@
+{
+
+	"os": "Linux",
+	"controls" : {
+		"up": "up",
+		"right": "right",
+		"left": "left",
+		"down": "down",
+		"a": "a",
+		"b": "b",
+		"z": "z",
+		"x": "x",
+		"ltrig": "0",
+		"rtrig": "9",
+		"start": "space",
+		"cup": "i",
+		"cright": "l",
+		"cdown": "k",
+		"cleft": "j",
+		"ddown": "1",
+		"dleft": "2",
+		"dright": "3",
+		"dup": "4"
+	}
+
+
+}
