@@ -1,74 +1,43 @@
 import pyautogui
-import platform
 import pynput
 import time
-
-if platform.system() == 'Windows':
-	import directkeys
-	right = 0xCd
-	linux = False
-else:
-	linux = True
-
-
-
-controls = {
-	"up": "up",
-	"right": "right",
-	"left": "left",
-	"down": "down",
-	"a": "a",
-	"b": "b",
-	"z": "z",
-	"x": "x",
-	"ltrig": "0",
-	"rtrig": "9",
-	"start": "space",
-	"cup": "i",
-	"cright": "l",
-	"cdown": "k",
-	"cleft": "j",
-	"ddown": "1",
-	"dleft": "2",
-	"dright": "3",
-	"dup": "4"
-}
-
+import json
 
 class Controller:
 	def __init__(self):
-		global linux
-		self.os = platform.system()
-		print(self.os)
-		self.screen = pyautogui.size()
+            with open("config.json") as config_file:
+                config = json.load(config_file)
+                self.controls = config["controls"]
+               	self.os = config["os"]
+            
+            self.screen = pyautogui.size()
+            self.window = [-1,-1,-1,-1]
+    
+            if self.os == 'Windows':
+                # import fails while using Linux
+                import pygetwindow as gw
+                window = gw.getAllTitles()
+                for title in window:
+                    if "Super" in title or "Dolphin" in title:
+                        window = title
 
-		# Region of interest
-		self.window = [-1, -1, -1, -1]
+                        window = gw.getWindowsWithTitle(window)[0]
+                        window.moveTo(5, 5)
+                        window.resizeTo(600, 500)
 
-		if self.os == 'Windows':
-			linux = False
-			# import fails while using Linux
-			import pygetwindow as gw
+                        self.window[0], self.window[1] = window.topleft
+                        self.window[2], self.window[3] = window.bottomright
 
-			window = gw.getAllTitles()
-			for title in window:
-				if "Super" in title or "Dolphin" in title:
-					window = title
-
-			window = gw.getWindowsWithTitle(window)[0]
-			window.moveTo(5, 5)
-			window.resizeTo(600, 500)
-
-			self.window[0], self.window[1] = window.topleft
-			self.window[2], self.window[3] = window.bottomright
-
-		elif self.os == 'Linux':
-			linux = True
-			print("Linux OS requires game window calibration")
-			self.calibrate_screen()
-			print("Calibration complete")
-			print()
-
+            elif self.os == 'Linux':
+                if "window" not in config:
+                    print("Linux OS requires game window calibration")
+                    self.calibrate_screen()
+                    print("Calibration complete")
+                    with open("config.json", "wb") as config_file:
+                        json.dump(self.window, config_file)
+                else:
+                    print(config["window"])
+                    
 	def click(self):
 		pyautogui.click()
 
@@ -81,7 +50,6 @@ class Controller:
 		# capture mouse location when clicked
 		with pynput.mouse.Listener(on_click=self.find_window) as listener:
 			listener.join()
-		print(self.window)
 		print("Move mouse to bottom of game window and click")
 
 		with pynput.mouse.Listener(on_click=self.find_window) as listener:
